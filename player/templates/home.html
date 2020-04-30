@@ -31,7 +31,7 @@ function showImageArray(useThisContext, imgArray) {
         if ((i % 4) == 3) { // A
             iData.data[i] = 255;
         } else {    // R G B
-            iData.data[i] = imgArray[j];
+            iData.data[i] = (imgArray[j]<<1);
             j += 1;
         }
     }
@@ -73,9 +73,24 @@ function doTheVideo() {
         }, 33);
 }
 
-/* fetch(`/imga/1`).then(x => x.json()).then(function (i1) {
-    fetch(`/imgad/900`).then(x => x.json()).then(i2d => showImageArrayDelta(i1, i2d));
-}); */
+function rle_decode(arr) {
+    // [3 17 3 8...] --> [17 17 17 8 8 8...]
+    const result = [];
+    for (let i = 0 ; i < arr.length ; i = i + 2) {
+        const repetition_count = arr[i];
+        const symbol = arr[i+1];
+        for (let j = 0 ; j < repetition_count ; ++j) {
+            result.push(symbol);
+        }
+    }
+
+    return result;
+}
+
+fetch(`/imga/123`).then(x => x.json()).then(function (i1) {
+    showImageArray(ctx, rle_decode(i1));
+    //fetch(`/imgad/900`).then(x => x.json()).then(i2d => showImageArrayDelta(i1, i2d));
+});
 
 function doTheAudio() {
     fetch("/a").then(x => x.json()).then(function (x) {
