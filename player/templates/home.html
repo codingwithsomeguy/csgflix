@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>player</title>
+</head>
+<body>
+<canvas id="canvas" width="426" height="240" style="background-color:black">
+</canvas>
+
+<br><br>
+
+<canvas id="deltacanvas" width="426" height="240" style="background-color:black">
+</canvas>
+
+
+
+<script>
+const w = 426;  const h = 240;
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const offcanvas = new OffscreenCanvas(w, h);
+const offCtx = offcanvas.getContext("2d");
+
+ctx.clearRect(0, 0, w, h);
+offCtx.clearRect(0, 0, w, h);
+
+
+function showImageArray(useThisContext, imgArray) {
+    const iData = offCtx.createImageData(w, h);
+    for (let i = 0, j = 0; i < imgArray.length; ++i) {
+        if ((i % 4) == 3) { // A
+            iData.data[i] = 255;
+        } else {    // R G B
+            iData.data[i] = imgArray[j];
+            j += 1;
+        }
+    }
+
+    //console.log(iData);
+    useThisContext.putImageData(iData, 0, 0);
+}
+
+function showImageArrayDelta(imgArrayI1, imgArrayDelta) {
+    const deltaCanvas = document.getElementById("deltacanvas");
+    const deltaCtx = deltaCanvas.getContext("2d");
+
+    showImageArray(deltaCtx, imgArrayDelta);
+
+    const iData = offCtx.createImageData(w, h);
+    for (let i = 0, j = 0; i < imgArrayI1.length; ++i) {
+        if ((i % 4) == 3) { // A
+            iData.data[i] = 255;
+        } else {    // R G B
+            iData.data[i] = imgArrayI1[j] ^ imgArrayDelta[j];
+            j += 1;
+        }
+    }
+
+    //console.log(iData);
+    ctx.putImageData(iData, 0, 0);
+}
+
+
+
+let i = 1;
+function doTheVideo() {
+    const videoTimer = setInterval(function () {
+            fetch(`/imga/${i}`).then(x => x.json()).then(x => showImageArray(ctx, x));
+            i += 1;
+            if (i >= 900) {
+                clearInterval(videoTimer);
+            }
+        }, 33);
+}
+
+/* fetch(`/imga/1`).then(x => x.json()).then(function (i1) {
+    fetch(`/imgad/900`).then(x => x.json()).then(i2d => showImageArrayDelta(i1, i2d));
+}); */
+
+function doTheAudio() {
+    fetch("/a").then(x => x.json()).then(function (x) {
+        const aCtx = new window.AudioContext();
+        const buf = aCtx.createBuffer(1, x.length, 8000);
+        const bufChan = buf.getChannelData(0);
+        for (let i = 0; i < x.length; ++i) {
+            bufChan[i] = (x[i] - 128) / 128.0;
+        }
+
+        const bufSource = aCtx.createBufferSource();
+        bufSource.buffer = buf;
+        bufSource.connect(aCtx.destination);
+        bufSource.start();
+
+        doTheVideo();
+    });
+}
+
+//doTheAudio();
+
+</script>
+<button onclick="doTheAudio()">Play Button</button>
+</body>
+</html>
