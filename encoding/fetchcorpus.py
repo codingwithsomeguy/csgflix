@@ -34,7 +34,7 @@ def extract_images_from_videos():
 
         if os.path.exists(out_dir) == False:
             os.makedirs(out_dir, exist_ok=True)
-            cmd = "ffmpeg -i '%s' -vsync 0 '%s/m1i%%3d.png'" % (filename, out_dir)
+            cmd = "ffmpeg -i '%s' -vsync 0 '%s/i%%3d.png'" % (filename, out_dir)
             print(cmd)
             os.system(cmd)
         else:
@@ -85,12 +85,16 @@ def fetchcorpus():
             print("File %s exists, skipping" % full_filename)
 
 
-if __name__ == "__main__":
-    # TODO: test these are there
-    # depends on ffmpeg (mp4 / image unpacking), faad (aac --> wav),
-    #   sox (wav --> 8khz resampling)
+def main():
     fetchcorpus()
     make_short_videos()
     extract_images_from_videos()
     extract_audio_from_video()
     transcode_audio_to_lowquality()
+
+
+if __name__ == "__main__":
+    # TODO: test these are there
+    # depends on ffmpeg (mp4 / image unpacking), faad (aac --> wav),
+    #   sox (wav --> 8khz resampling)
+    main()
