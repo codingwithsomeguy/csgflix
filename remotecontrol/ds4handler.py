@@ -42,8 +42,8 @@ def send_key(key_name):
     key_to_xkeysym = {
         "DS4_BUTTON_LEFT": "Left", "DS4_BUTTON_RIGHT": "Right",
         "DS4_BUTTON_UP": "Up", "DS4_BUTTON_DOWN": "Down",
-        "DS4_BUTTON_CROSS": "B", "DS4_BUTTON_CIRCLE": "A",
-        "DS4_BUTTON_TRIANGLE": "X", "DS4_BUTTON_SQUARE": "Y",
+        "DS4_BUTTON_CROSS": "b", "DS4_BUTTON_CIRCLE": "a",
+        "DS4_BUTTON_TRIANGLE": "x", "DS4_BUTTON_SQUARE": "y",
     }
 
     if key_name in key_to_xkeysym:
