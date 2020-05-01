@@ -1,4 +1,4 @@
-import os, json
+import os, json, shutil
 import wave
 
 import PIL.Image
@@ -17,7 +17,8 @@ def rle_encode(arr):
 def imga(image_filename):
     i1 = PIL.Image.open(image_filename)
     i1a = np.array(i1).flatten()
-    i1a = np.array([x >> 1 for x in i1a])
+    # disable RGB888 --> RGB777 for now
+    #i1a = np.array([x >> 1 for x in i1a])
     # Clamp:
     i1a[i1a <= 20] = 0
     # RLE:
@@ -87,7 +88,8 @@ def pack_csgson_codec(movie_set):
             "i%03d.png" % delta_image_num)
         if os.path.exists(delta_file):
             print("Delta:", last_file, delta_file)
-            packed["deltas"].append(imgad(last_file, delta_file))
+            delta_image = imgad(last_file, delta_file)
+            packed["deltas"].append(delta_image)
             delta_image_num += 1
         else:
             break
@@ -95,13 +97,34 @@ def pack_csgson_codec(movie_set):
     audio_file = os.path.join("media", "audio", "%s-8khz.wav" % movie_set)
     packed["audio"] = audioarray(audio_file)
 
+    # TODO: add a timedtext format
+    packed["timedtext"] = []
+
+    # TODO: add seekimages
+    packed["seekimages"] = []
+
     print("pack_csgson_codec: writing", out_file)
     json.dump(packed, open(out_file, "w"))
 
 
+# simplest possible boxart... first frame
+def get_first_frame_boxart(movie_set):
+    print("get_first_frame_boxart:", movie_set)
+    out_dir = os.path.join("media", "encoded")
+    # Consider using imga format, simplify for UI for now
+    out_file = os.path.join(out_dir, movie_set + ".png")
+    if os.path.exists(out_file):
+        print("get_first_frame_boxart: file exists, skipping:", out_file)
+        return
+    image_file = os.path.join("media", "img", movie_set, "i001.png")
+    shutil.copyfile(image_file, out_file)
+
+
 def main():
     for i in range(2, 7+1):
-        pack_csgson_codec("movie%d-240p-0" % i)
+        movie_set = "movie%d-240p-0" % i
+        pack_csgson_codec(movie_set)
+        get_first_frame_boxart(movie_set)
 
 
 if __name__ == "__main__":
