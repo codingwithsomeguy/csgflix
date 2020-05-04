@@ -160,7 +160,8 @@ function fetchAndPlay() {
     // would need some CORS...
     const cdnBaseUrl = "/cdn/movie/";
     //const selectedMovieFile = "movie4-240p-0.csgson";
-    const selectedMovieFile = "movie5-240p-0.csgson";
+    //const selectedMovieFile = "movie5-240p-0.csgson";
+    const selectedMovieFile = window.location.search.slice(1);
     const url = cdnBaseUrl + selectedMovieFile;
     //fetch(url).then(x => x.json()).then(singleFrame);
     fetch(url).then(x => x.json()).then(play);

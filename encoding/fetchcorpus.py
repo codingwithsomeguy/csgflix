@@ -84,6 +84,15 @@ def fetchcorpus():
         else:
             print("File %s exists, skipping" % full_filename)
 
+    # also get the metadata / catalog.json
+    url = "%s/catalog.json" % BASE_URL
+    full_filename = os.path.join(DEST_DIR, "catalog.json")
+    if os.path.exists(full_filename) == False:
+        print("Fetching %s to %s" % (url, full_filename))
+        urlretrieve(url, filename=full_filename)
+    else:
+        print("File %s exists, skipping" % full_filename)
+
 
 def main():
     fetchcorpus()
