@@ -5,6 +5,9 @@ import PIL.Image
 import numpy as np
 from itertools import groupby
 
+from config import *
+
+
 def rle_encode(arr):
     result = []
     for name, grp in groupby(arr):
@@ -59,7 +62,7 @@ def audioarray(audio_filename):
 
 def pack_csgson_codec(movie_set, source_set, scale=1):
     print("pack_csgson_codec:", movie_set)
-    out_dir = os.path.join("media", "encoded")
+    out_dir = os.path.join(ENCODE_DIR, "movie")
     out_file = os.path.join(out_dir, movie_set + ".csgson")
     if os.path.exists(out_file):
         print("pack_csgson_codec: file exists, skipping:", out_file)
@@ -121,7 +124,8 @@ def pack_csgson_codec(movie_set, source_set, scale=1):
 # simplest possible boxart... first frame
 def get_first_frame_boxart(movie_set):
     print("get_first_frame_boxart:", movie_set)
-    out_dir = os.path.join("media", "encoded")
+    out_dir = os.path.join(ENCODE_DIR, "boxart")
+    os.makedirs(out_dir, exist_ok=True)
     # Consider using imga format, simplify for UI for now
     out_file = os.path.join(out_dir, movie_set + ".png")
     if os.path.exists(out_file):

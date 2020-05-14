@@ -132,3 +132,4 @@ dmypy.json
 *.swp
 encoding/media/
 player/v0/
+player/static/cdn/

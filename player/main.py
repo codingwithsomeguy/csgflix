@@ -1,12 +1,19 @@
 import os, json, sys
 
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, g
 app = Flask(__name__)
+
+
+def get_cdn_url():
+    if 'cdn' not in g:
+        g.cdn_url = "/static/cdn/"
+    return g.cdn_url
 
 
 @app.route("/")
 def home():
-    return render_template("ui.html", data={"foo": "bar",})
+    return render_template("ui.html", data={"cdnbaseurl": get_cdn_url(),})
+
 
 @app.route("/search/<searchquery>")
 def search(searchquery):
@@ -27,28 +34,8 @@ def search(searchquery):
 
 @app.route("/play")
 def play():
-    # TODO: something
     return render_template("player.html",
-        data={"cdnbaseurl": "/cdn/movie/",})
-
-
-#TODO: dump the two cdn routines
-# added - identical to cdn_movie, but image type for boxart
-# (avoids needing to copy to static)
-@app.route("/cdn/boxart/<moviefile>")
-def cdn_boxart(moviefile):
-    print("fake_cdn:", moviefile)
-    # TODO: don't do this
-    result = open("../encoding/media/encoded/" + moviefile, "rb").read()
-    return Response(result, mimetype="image/png")
-
-
-@app.route("/cdn/movie/<moviefile>")
-def cdn_movie(moviefile):
-    print("fake_cdn:", moviefile)
-    # TODO: don't do this
-    result = open("../encoding/media/encoded/" + moviefile).read()
-    return Response(result, mimetype="text/json")
+        data={"cdnbaseurl": get_cdn_url(),})
 
 
 if __name__ == "__main__":

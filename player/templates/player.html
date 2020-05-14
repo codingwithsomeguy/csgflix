@@ -194,8 +194,7 @@ function singleFrame(csgson) {
 }
 
 function fetchAndPlay() {
-    // would need some CORS...
-    const cdnBaseUrl = "{{ data["cdnbaseurl"] }}";
+    const cdnBaseUrl = "{{ data["cdnbaseurl"] }}/movie/";
     //const selectedMovieFile = "movie4-240p-0.csgson";
     //const selectedMovieFile = "movie5-240p-0.csgson";
     const selectedMovieFile = window.location.search.slice(1);

@@ -51,7 +51,8 @@ function addSearchCell(resultEntry) {
     searchCell.style.height = "220px";
     searchCell.style.display = "inline-block";
     searchCell.style.marginLeft = "15px";
-    const boxartUrl = "/cdn/boxart/" + resultEntry["boxart"];
+    const boxartUrl = '{{ data["cdnbaseurl"] }}/boxart/' +
+        resultEntry["boxart"];
     const mediaUrl = "/play?" + encodeURIComponent(resultEntry["media"]);
     //console.log(resultEntry);
     searchCell.innerHTML = `<a href="${mediaUrl}"><img src="${boxartUrl}" width="100%" height="100%">${resultEntry["title"]}</a>`;
