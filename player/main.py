@@ -1,4 +1,4 @@
-import os, json
+import os, json, sys
 
 from flask import Flask, render_template, request, Response
 app = Flask(__name__)
@@ -28,7 +28,7 @@ def search(searchquery):
 @app.route("/play")
 def play():
     # TODO: something
-    return render_template("home.html", data={"foo": "bar",})
+    return render_template("home.html", data={"cdnbaseurl": "/cdn/movie/",})
 
 
 #TODO: dump the two cdn routines
@@ -51,5 +51,7 @@ def cdn_movie(moviefile):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0")
-
+    if len(sys.argv) == 2:
+        app.run(debug=True, host="0.0.0.0", port=int(sys.argv[1]))
+    else:
+        app.run(debug=True, host="0.0.0.0")
