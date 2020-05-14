@@ -3,11 +3,13 @@
 <title>player</title>
 </head>
 <body>
+Canvas:<br>
 <canvas id="canvas" width="426" height="240" style="background-color:black">
 </canvas>
 
 <br><br>
 
+Delta Canvas:<br>
 <canvas id="deltacanvas" width="426" height="240" style="background-color:black">
 </canvas>
 
@@ -122,10 +124,26 @@ function doTheAudio() {
 
 //doTheAudio();
 
+function adjustVideoCanvases(width, height) {
+    console.log("adjustVideoCanvases: " + width + ", " + height);
+    const deltaCanvas = document.getElementById("deltacanvas");
+
+    canvas.width = width;
+    canvas.height = height;
+
+    offcanvas.width = width;
+    offcanvas.height = height;
+
+    deltaCanvas.width = width;
+    deltaCanvas.height = height;
+}
+
 function play(csgson) {
     console.log("Playing CSGSON:", csgson);
-    // TODO: read the metadata
-    // TODO: decode the whole chunk before playing
+    // TODO: read more of the metadata
+    const videoWidth = csgson["meta"]["resolution"]["width"];
+    const videoHeight = csgson["meta"]["resolution"]["height"];
+    adjustVideoCanvases(videoWidth, videoHeight);
 
     // TODO: check the audio / video sync, not async streams
     playAudioArray(csgson["audio"]);

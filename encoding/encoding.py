@@ -14,8 +14,17 @@ def rle_encode(arr):
     return result
 
 
-def imga(image_filename):
+def apply_scale(img, scale):
+    if scale != 1:
+        img = img.resize(
+            (int(img.width * scale), int(img.height * scale)),
+            PIL.Image.ANTIALIAS)
+    return img
+
+
+def imga(image_filename, scale=1):
     i1 = PIL.Image.open(image_filename)
+    i1 = apply_scale(i1, scale)
     i1a = np.array(i1).flatten()
     # disable RGB888 --> RGB777 for now
     #i1a = np.array([x >> 1 for x in i1a])
@@ -27,10 +36,12 @@ def imga(image_filename):
     return result
 
 
-def imgad(base_image_filename, offset_image_filename):
+def imgad(base_image_filename, offset_image_filename, scale=1):
     i1 = PIL.Image.open(base_image_filename)
+    i1 = apply_scale(i1, scale)
     i1a = np.array(i1)
     i2 = PIL.Image.open(offset_image_filename)
+    i2 = apply_scale(i2, scale)
     i2a = np.array(i2)
 
     deltai = i1a ^ i2a
@@ -46,7 +57,7 @@ def audioarray(audio_filename):
     return result
 
 
-def pack_csgson_codec(movie_set):
+def pack_csgson_codec(movie_set, source_set, scale=1):
     print("pack_csgson_codec:", movie_set)
     out_dir = os.path.join("media", "encoded")
     out_file = os.path.join(out_dir, movie_set + ".csgson")
@@ -62,8 +73,8 @@ def pack_csgson_codec(movie_set):
             "version": "0.1",
             # TODO: take this as a param
             "resolution": {
-                "width": 426,
-                "height": 240,
+                "width": int(426 * scale),
+                "height": int(240 * scale),
                 "depth": 3
             },
             # TODO: unroll this
@@ -72,8 +83,8 @@ def pack_csgson_codec(movie_set):
     }
 
     # be naive about unpacked video (assume fetchcorpus.py ran)
-    image_file = os.path.join("media", "img", movie_set, "i001.png")
-    packed["image"] = imga(image_file)
+    image_file = os.path.join("media", "img", source_set, "i001.png")
+    packed["image"] = imga(image_file, scale)
     
     # naively pack all delta frames relative to the one before
     packed["deltas"] = []
@@ -82,19 +93,19 @@ def pack_csgson_codec(movie_set):
     done = False
     # TODO: don't rely on fixed size image numbers eg i009.png
     while True:
-        last_file = os.path.join("media", "img", movie_set,
+        last_file = os.path.join("media", "img", source_set,
             "i%03d.png" % (delta_image_num - 1))
-        delta_file = os.path.join("media", "img", movie_set,
+        delta_file = os.path.join("media", "img", source_set,
             "i%03d.png" % delta_image_num)
         if os.path.exists(delta_file):
             print("Delta:", last_file, delta_file)
-            delta_image = imgad(last_file, delta_file)
+            delta_image = imgad(last_file, delta_file, scale)
             packed["deltas"].append(delta_image)
             delta_image_num += 1
         else:
             break
 
-    audio_file = os.path.join("media", "audio", "%s-8khz.wav" % movie_set)
+    audio_file = os.path.join("media", "audio", "%s-8khz.wav" % source_set)
     packed["audio"] = audioarray(audio_file)
 
     # TODO: add a timedtext format
@@ -121,10 +132,15 @@ def get_first_frame_boxart(movie_set):
 
 
 def main():
-    for i in range(2, 7+1):
-        movie_set = "movie%d-240p-0" % i
-        pack_csgson_codec(movie_set)
-        get_first_frame_boxart(movie_set)
+    for scale in [1, 0.5]:
+        for i in range(2, 7+1):
+            source_set = "movie%d-%dp-0" % (i, 240)
+            vertical = int(240 * scale)
+            movie_set = "movie%d-%dp-0" % (i, vertical)
+            pack_csgson_codec(movie_set, source_set, scale)
+            if scale == 1:
+                # only do the boxart if we're at original scale
+                get_first_frame_boxart(movie_set)
 
 
 if __name__ == "__main__":

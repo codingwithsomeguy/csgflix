@@ -4,13 +4,7 @@ import os
 from glob import glob
 from urllib.request import urlretrieve
 
-
-BASE_URL = "http://codingwithsomeguy.com/csgflixcorpus"
-DEST_DIR = "media/original"
-CLIP_DIR = "media/clip"
-IMG_DIR = "media/img"
-RAW_AUDIO_DIR = "media/rawaudio"
-AUDIO_DIR = "media/audio"
+from config import *
 
 
 def make_short_videos():
@@ -19,7 +13,8 @@ def make_short_videos():
         file_part = os.path.splitext(os.path.split(filename)[-1])[0]
         clip_filename = os.path.join(CLIP_DIR, file_part + "-240p-0.mp4")
         if os.path.exists(clip_filename) == False:
-            cmd = "ffmpeg -y -i '%s' -t 30 -s 426x240 '%s'" % (filename, clip_filename)
+            cmd = "ffmpeg -y -i '%s' -t %d -s 426x240 '%s'" % (
+                filename, CLIP_LENGTH, clip_filename)
             print(cmd)
             os.system(cmd)
         else:
