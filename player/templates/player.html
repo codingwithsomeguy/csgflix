@@ -204,8 +204,18 @@ function fetchAndPlay() {
     fetch(url).then(x => x.json()).then(play);
 }
 
+function handleKey(evt) {
+    console.log(evt);
+    if (evt.key === "b") {
+        fetchAndPlay();
+    } else if (evt.key === "a") {
+        window.history.back();
+    }
+}
+
+window.addEventListener("keydown", handleKey);
 
 </script>
-<button onclick="fetchAndPlay()">Play Button</button>
+<button onclick="fetchAndPlay()" autofocus>Play Button</button>
 </body>
 </html>

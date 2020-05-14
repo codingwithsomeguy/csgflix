@@ -28,7 +28,8 @@ def search(searchquery):
 @app.route("/play")
 def play():
     # TODO: something
-    return render_template("home.html", data={"cdnbaseurl": "/cdn/movie/",})
+    return render_template("player.html",
+        data={"cdnbaseurl": "/cdn/movie/",})
 
 
 #TODO: dump the two cdn routines
