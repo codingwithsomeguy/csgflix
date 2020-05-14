@@ -119,6 +119,8 @@ function rle_decode(arr) {
     //fetch(`/imgad/900`).then(x => x.json()).then(i2d => showImageArrayDelta(i1, i2d));
 }); */
 
+// TODO: Move to a player object
+let bufSource;
 function playAudioArray(x) {
     const aCtx = new window.AudioContext();
     const buf = aCtx.createBuffer(1, x.length, 8000);
@@ -127,7 +129,7 @@ function playAudioArray(x) {
         bufChan[i] = (x[i] - 128) / 128.0;
     }
 
-    const bufSource = aCtx.createBufferSource();
+    bufSource = aCtx.createBufferSource();
     bufSource.buffer = buf;
     bufSource.connect(aCtx.destination);
     bufSource.start();
@@ -156,6 +158,8 @@ function adjustVideoCanvases(width, height) {
     deltaCanvas.height = height;
 }
 
+// TODO: Move to a player object
+let videoTimer;
 function play(csgson) {
     console.log("Playing CSGSON:", csgson);
     // TODO: read more of the metadata
@@ -171,7 +175,7 @@ function play(csgson) {
 
     showImageArray(ctx, firstImage);
     let i = 0;
-    const videoTimer = setInterval(function () {
+    videoTimer = setInterval(function () {
             const nextDelta = rle_decode(csgson["deltas"][i]);
             lastDelta = showImageArrayDelta(lastDelta, nextDelta);
             showScaledVideo();
@@ -203,12 +207,25 @@ function fetchAndPlay() {
     fetch(url).then(x => x.json()).then(play);
 }
 
+function stopPlaying() {
+    console.log("stopping");
+    if (typeof videoTimer !== "undefined") {
+        clearInterval(videoTimer);
+    }
+
+    if (typeof bufSource !== "undefined") {
+        bufSource.stop();
+    }
+}
+
 function handleKey(evt) {
     console.log(evt);
     if (evt.key === "b") {
         fetchAndPlay();
     } else if (evt.key === "a") {
         window.history.back();
+    } else if (evt.key === "x") {
+        stopPlaying();
     }
 }
 
@@ -216,5 +233,6 @@ window.addEventListener("keydown", handleKey);
 
 </script>
 <button onclick="fetchAndPlay()" autofocus>Play Button</button>
+<button onclick="stopPlaying()">Stop Button</button>
 </body>
 </html>
