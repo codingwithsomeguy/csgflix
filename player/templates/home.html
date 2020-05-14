@@ -3,15 +3,26 @@
 <title>player</title>
 </head>
 <body>
-Canvas:<br>
-<canvas id="canvas" width="426" height="240" style="background-color:black">
-</canvas>
+Video Player:<br>
+<img id="videoimg" width="426" height="240" style="background-color:black">
 
 <br><br>
-
-Delta Canvas:<br>
+<table><tbody>
+<tr>
+<td>Actual Size:</td>
+<td>Delta Canvas:</td>
+</tr>
+<tr height="250" width="860" valign="top">
+<td width="430">
+<canvas id="canvas" width="426" height="240" style="background-color:black">
+</canvas>
+</td>
+<td width="430">
 <canvas id="deltacanvas" width="426" height="240" style="background-color:black">
 </canvas>
+</td>
+</tr>
+</tbody></table>
 
 
 
@@ -28,7 +39,8 @@ offCtx.clearRect(0, 0, w, h);
 
 
 function showImageArray(useThisContext, imgArray) {
-    const iData = offCtx.createImageData(w, h);
+    const iData = offCtx.createImageData(
+        useThisContext.canvas.width, useThisContext.canvas.height);
     for (let i = 0, j = 0; j < imgArray.length; ++i) {
         if ((i % 4) == 3) { // A
             iData.data[i] = 255;
@@ -50,7 +62,8 @@ function showImageArrayDelta(imgArrayI1, imgArrayDelta) {
 
     showImageArray(deltaCtx, imgArrayDelta);
 
-    const iData = offCtx.createImageData(w, h);
+    const iData = offCtx.createImageData(
+        deltaCanvas.width, deltaCanvas.height);
     // save the non-RGBA computed image too for next frame
     const computedImage = new Uint8ClampedArray(imgArrayI1.length);
     for (let i = 0, j = 0; j < imgArrayI1.length; ++i) {
@@ -69,6 +82,11 @@ function showImageArrayDelta(imgArrayI1, imgArrayDelta) {
     return computedImage;
 }
 
+const videoImg = document.getElementById("videoimg");
+function showScaledVideo() {
+    const imgUrl = canvas.toDataURL();
+    videoImg.src = imgUrl;
+}
 
 
 let i = 1;
@@ -156,6 +174,7 @@ function play(csgson) {
     const videoTimer = setInterval(function () {
             const nextDelta = rle_decode(csgson["deltas"][i]);
             lastDelta = showImageArrayDelta(lastDelta, nextDelta);
+            showScaledVideo();
             //console.log(lastDelta);
             //lastDelta = nextDelta;
 
