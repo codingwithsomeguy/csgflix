@@ -158,8 +158,17 @@ function adjustVideoCanvases(width, height) {
     deltaCanvas.height = height;
 }
 
+function emitMetric(metricName, value) {
+    console.log(metricName, value);
+    const bundle = JSON.stringify({metricName: value});
+    const stringified = encodeURIComponent(bundle);
+    console.log(stringified);
+    fetch("/metric?d=" + stringified).then(console.log("emitMetric: sent"));
+}
+
 // TODO: Move to a player object
 let videoTimer;
+let startTime;
 function play(csgson) {
     console.log("Playing CSGSON:", csgson);
     // TODO: read more of the metadata
@@ -174,6 +183,8 @@ function play(csgson) {
     let lastDelta = firstImage;
 
     showImageArray(ctx, firstImage);
+    const endTime = Date.now();
+    const ttp = endTime - startTime;
     let i = 0;
     videoTimer = setInterval(function () {
             const nextDelta = rle_decode(csgson["deltas"][i]);
@@ -189,6 +200,7 @@ function play(csgson) {
             }
         //}, 1000);
         }, 33);
+    emitMetric("ttp", ttp);
 }
 
 function singleFrame(csgson) {
@@ -204,6 +216,7 @@ function fetchAndPlay() {
     const selectedMovieFile = window.location.search.slice(1);
     const url = cdnBaseUrl + selectedMovieFile;
     //fetch(url).then(x => x.json()).then(singleFrame);
+    startTime = Date.now();
     fetch(url).then(x => x.json()).then(play);
 }
 

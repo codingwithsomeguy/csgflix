@@ -38,6 +38,18 @@ def play():
         data={"cdnbaseurl": get_cdn_url(),})
 
 
+@app.route("/metric")
+def metric():
+    if "d" in request.args:
+        try:
+            metrics_obj = json.loads(request.args["d"])
+            print("metrics data:", metrics_obj)
+        except ValueError:
+            pass
+
+    return "OK"
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 2:
         app.run(debug=True, host="0.0.0.0", port=int(sys.argv[1]))
